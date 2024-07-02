@@ -38,11 +38,13 @@ const DisplayMessage = ({ text, isCreatedByUser = false, message, showCursor }: 
 };
 
 export default function Part({
+  code,
   part,
   showCursor,
   isSubmitting,
   message,
 }: {
+  code: boolean,
   part: TMessageContentParts;
   isSubmitting: boolean;
   showCursor: boolean;
@@ -56,11 +58,41 @@ export default function Part({
     return <ErrorMessage message={message} text={part[ContentTypes.TEXT].value} className="my-2" />;
   } else if (part.type === ContentTypes.TEXT) {
     // Access the value property
+
+    const getCodeFreeText = (text: string) => {
+      const codeBlockPattern = /```typescript[\s\S]*?```/g;
+      if (codeBlockPattern.test(text)) {
+        return text.replace(codeBlockPattern, '');
+      } else {
+        const startIndex = text.indexOf('```typescript');
+        if (startIndex !== -1) {
+          return text.substring(0, startIndex);
+        }
+      }
+      return text.replace(/```typescript([\s\S]*?)```/g, '');
+    };
+
+    const getCodeOnlyText = (text: string) => {
+      const match = text.match(/```typescript[\s\S]*?```/g);
+      if (match) {
+        return match.join('\n');
+      }
+      const startIndex = text.indexOf('```typescript');
+      if (startIndex !== -1) {
+        return text.substring(startIndex);
+      }
+      return '';
+    };
+
+    const cleanText = code
+      ? getCodeOnlyText(part[ContentTypes.TEXT].value)
+      : getCodeFreeText(part[ContentTypes.TEXT].value);
+
     return (
       <Container message={message}>
         <div className="markdown prose dark:prose-invert light dark:text-gray-70 my-1 w-full break-words">
           <DisplayMessage
-            text={part[ContentTypes.TEXT].value}
+            text={cleanText}
             isCreatedByUser={message.isCreatedByUser}
             message={message}
             showCursor={showCursor}

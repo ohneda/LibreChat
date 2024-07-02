@@ -5,6 +5,9 @@ import ScrollToBottom from '~/components/Messages/ScrollToBottom';
 import { useScreenshot, useMessageScrolling } from '~/hooks';
 import { CSSTransition } from 'react-transition-group';
 import MultiMessage from './MultiMessage';
+import Artifacts from './Content/Artifacts';
+import LastMessage from './Content/LastMessage';
+import { cn } from '~/utils';
 
 export default function MessagesView({
   messagesTree: _messagesTree,
@@ -26,7 +29,7 @@ export default function MessagesView({
   } = useMessageScrolling(_messagesTree);
 
   const { conversationId } = conversation ?? {};
-
+  const [lastMessage, setLastMessage] = useState<TMessage | null>(null);
   return (
     <div className="flex-1 overflow-hidden overflow-y-auto">
       <div className="dark:gpt-dark-gray relative h-full">
@@ -47,14 +50,31 @@ export default function MessagesView({
             ) : (
               <>
                 {Header && Header}
-                <div ref={screenshotTargetRef}>
-                  <MultiMessage
-                    key={conversationId} // avoid internal state mixture
-                    messagesTree={_messagesTree}
-                    messageId={conversationId ?? null}
-                    setCurrentEditId={setCurrentEditId}
-                    currentEditId={currentEditId ?? null}
-                  />
+                <div ref={screenshotTargetRef} className=" flex">
+                  <div className={cn(lastMessage ? 'w-[700px]' : 'w-full')}>
+                    <MultiMessage
+                      key={conversationId} // avoid internal state mixture
+                      messagesTree={_messagesTree}
+                      messageId={conversationId ?? null}
+                      setCurrentEditId={setCurrentEditId}
+                      currentEditId={currentEditId ?? null}
+                    />
+                  </div>
+                  <div className="">
+                    <div
+                      style={{ position: 'fixed' }}
+                      className={cn(lastMessage ? 'w-[700px]' : 'w-0')}
+                    >
+                      <LastMessage
+                        lastMessage={lastMessage}
+                        setLastMessage={setLastMessage}
+                        messageId={conversationId ?? null}
+                        messagesTree={_messagesTree}
+                        currentEditId={currentEditId ?? null}
+                        setCurrentEditId={setCurrentEditId}
+                      />
+                    </div>
+                  </div>
                 </div>
               </>
             )}

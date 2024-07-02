@@ -5,6 +5,7 @@ import { DelayedRender } from '~/components/ui';
 import Part from './Part';
 
 const ContentParts = ({
+  code,
   error,
   unfinished,
   isSubmitting,
@@ -27,6 +28,7 @@ any) => {
             const showCursor = idx === content.length - 1 && isLast;
             return (
               <Part
+                code={code}
                 key={`display-${messageId}-${idx}`}
                 showCursor={showCursor && isSubmitting}
                 isSubmitting={isSubmitting}

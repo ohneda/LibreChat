@@ -48,6 +48,7 @@ export default function MultiMessage({
   if (message.content) {
     return (
       <MessageParts
+        code={false}
         key={message.messageId}
         message={message}
         currentEditId={currentEditId}
